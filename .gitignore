@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local dev server output
 dev-server.log
+
+# old local nested project folder
+/portfolio/

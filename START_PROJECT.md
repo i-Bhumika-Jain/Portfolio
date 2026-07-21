@@ -1,6 +1,6 @@
 # Start Project Guide
 
-This project is a frontend-only portfolio website.
+This is a frontend-only portfolio website.
 
 It uses:
 
@@ -15,7 +15,7 @@ There is no backend, no login, no sign out, and no database.
 ## Project Location
 
 ```powershell
-\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks\portfolio
+\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks
 ```
 
 ## Start The Website Locally
@@ -23,7 +23,7 @@ There is no backend, no login, no sign out, and no database.
 Open PowerShell, then run:
 
 ```powershell
-pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks\portfolio"
+pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks"
 npm run dev
 ```
 
@@ -57,23 +57,21 @@ Then press Enter.
 
 ## Build For Deployment
 
-To create the production/static build, run:
-
 ```powershell
-pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks\portfolio"
+pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks"
 npm run build
 ```
 
 The static deployment files will be created here:
 
 ```text
-portfolio\out
+out
 ```
 
 ## Run Lint Check
 
 ```powershell
-pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks\portfolio"
+pushd "\\fs01-dev\Home_Folder\bjain\Desktop\doc\chinetworks"
 npm run lint
 ```
 
@@ -82,6 +80,8 @@ npm run lint
 - `src/app/page.tsx` - main portfolio page
 - `src/app/layout.tsx` - page title and metadata
 - `src/app/globals.css` - global styles
+- `src/components/HeroScene.tsx` - Three.js hero scene
+- `src/data/portfolio.ts` - editable portfolio content
 - `next.config.ts` - static export configuration
 - `package.json` - project scripts
 
@@ -95,6 +95,10 @@ npm run lint
   "lint": "eslint"
 }
 ```
+
+## Resume PDF
+
+The website does not need a resume PDF to run. The public GitHub version does not include your resume PDF.
 
 ## Notes
 

@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bhumikajain.info"),
   title: "Bhumika Jain | Software Developer",
   description:
     "Portfolio of Bhumika Jain — full-stack Software Developer building automation-first platforms with Python, Django, FastAPI, React, and AI/OCR.",
@@ -31,6 +32,15 @@ export const metadata: Metadata = {
     description:
       "Full-stack Software Developer building automation-first platforms with Python, Django, React, and AI/OCR.",
     type: "website",
+    url: "https://bhumikajain.info",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Bhumika Jain — Software Developer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bhumika Jain | Software Developer",
+    description:
+      "Full-stack Software Developer building automation-first platforms with Python, Django, React, and AI/OCR.",
+    images: ["/og.png"],
   },
 };
 

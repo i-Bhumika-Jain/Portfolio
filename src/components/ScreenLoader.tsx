@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { profile } from "@/data/portfolio";
+import { profile, stats } from "@/data/portfolio";
 
 /**
  * Flight BJ-26 - cinematic intro.
@@ -329,8 +329,34 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
   // Animated overlay is client-only: skip SSR markup entirely so
   // framer-motion's computed styles can't cause hydration mismatches.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
   const [phase, setPhase] = useState<Phase>("gate");
+
+  // Mark the flight as flown and hand over to the portfolio.
+  const finish = () => {
+    try {
+      window.localStorage.setItem("bj26-flown", "1");
+    } catch {}
+    window.speechSynthesis?.cancel();
+    onDone();
+  };
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
+  useEffect(() => {
+    // Returning visitors and reduced-motion users go straight to the
+    // portfolio. Append ?fly to the URL to replay the intro anytime.
+    const forceFly = new URLSearchParams(window.location.search).has("fly");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let flown = false;
+    try {
+      flown = window.localStorage.getItem("bj26-flown") === "1";
+    } catch {}
+    if (!forceFly && (reducedMotion || flown)) {
+      finishRef.current();
+      return;
+    }
+    setMounted(true);
+  }, []);
   const [count, setCount] = useState(0);
   const [voiceOn, setVoiceOn] = useState(true);
   const speak = useCaptainVoice(voiceOn);
@@ -359,7 +385,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
         speakRef.current(100);
         timersRef.current.push(window.setTimeout(() => setPhase("landing"), 500));
         timersRef.current.push(window.setTimeout(() => setPhase("welcome"), 3600));
-        timersRef.current.push(window.setTimeout(onDone, 6300));
+        timersRef.current.push(window.setTimeout(() => finishRef.current(), 7800));
       }
     }, 200);
     return () => window.clearInterval(tick);
@@ -392,7 +418,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
         </motion.div>
       )}
 
-      <AnimatePresence>{phase === "gate" && <BoardingPass onBoard={board} onSkip={onDone} />}</AnimatePresence>
+      <AnimatePresence>{phase === "gate" && <BoardingPass onBoard={board} onSkip={finish} />}</AnimatePresence>
 
       {phase !== "gate" && <BannerPlane landing={landing} />}
       {landing && <Runway />}
@@ -467,6 +493,19 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
             >
               Welcome to <span className="text-cyan-300">{profile.firstName}&apos;s</span> world
             </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="mt-8 flex flex-wrap items-start justify-center gap-x-10 gap-y-4 px-6"
+            >
+              {stats.slice(0, 3).map((s) => (
+                <div key={s.label} className="max-w-[10rem] text-center">
+                  <p className="text-2xl font-bold text-cyan-300 sm:text-3xl">{s.value}</p>
+                  <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400">{s.label}</p>
+                </div>
+              ))}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -486,10 +525,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
             {voiceOn ? "Voice on" : "Voice off"}
           </button>
           <button
-            onClick={() => {
-              window.speechSynthesis?.cancel();
-              onDone();
-            }}
+            onClick={finish}
             className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur transition hover:border-cyan-300/50 hover:text-cyan-200"
           >
             Skip flight

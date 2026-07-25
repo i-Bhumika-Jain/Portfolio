@@ -15,20 +15,26 @@ type Phase = "gate" | "flight" | "landing" | "welcome" | "fade";
 
 /* Narration lines, spoken by the "captain" via the Web Speech API. */
 const NARRATION: { at: number; text: string }[] = [
-  { at: 0, text: "Good evening. Welcome aboard flight B J 26 with Dev Airways. Your captain today is Bhumika Jain, software developer." },
-  { at: 30, text: "Bhumika turns slow, manual, error prone workflows into fast, automated systems." },
-  { at: 62, text: "She builds with Python, Django, React, and A I powered O C R. From D N S automation and cloud migration, to backup automation with Ansible." },
-  { at: 100, text: "We are now beginning our descent. Welcome to Bhumika's portfolio." },
+  { at: 0, text: "Welcome aboard flight B J 26. Your captain: Bhumika Jain, software developer." },
+  { at: 35, text: "She turns slow manual work into automated systems, with Python, Django, React, and A I." },
+  { at: 100, text: "We have landed. Welcome to Bhumika's portfolio." },
 ];
 
 function useCaptainVoice(enabled: boolean) {
   const spoken = useRef(new Set<number>());
-  const speak = (at: number) => {
-    if (!enabled || spoken.current.has(at)) return;
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
+  // onEnd fires when the line finishes speaking (immediately when voice is
+  // off/unavailable) so the landing can wait for the captain to finish.
+  // No unmount cancel here: cutting audio mid-word is exactly the bug.
+  const speak = (at: number, onEnd?: () => void) => {
+    if (spoken.current.has(at)) {
+      return;
+    }
     spoken.current.add(at);
     const line = NARRATION.find((n) => n.at === at);
-    if (!line) return;
+    if (!enabled || !line || typeof window === "undefined" || !window.speechSynthesis) {
+      onEnd?.();
+      return;
+    }
     const utter = new SpeechSynthesisUtterance(line.text);
     const voices = window.speechSynthesis.getVoices();
     const preferred =
@@ -37,9 +43,12 @@ function useCaptainVoice(enabled: boolean) {
     if (preferred) utter.voice = preferred;
     utter.rate = 0.98;
     utter.pitch = 1.05;
+    if (onEnd) {
+      utter.onend = onEnd;
+      utter.onerror = onEnd;
+    }
     window.speechSynthesis.speak(utter);
   };
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
   return speak;
 }
 
@@ -394,11 +403,36 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
       });
       if (value >= 100) {
         window.clearInterval(tick);
-        speakRef.current(100);
         timersRef.current.push(window.setTimeout(() => setPhase("landing"), 500));
         timersRef.current.push(window.setTimeout(() => setPhase("welcome"), 3600));
-        timersRef.current.push(window.setTimeout(() => setPhase("fade"), 7800));
-        timersRef.current.push(window.setTimeout(() => finishGentlyRef.current(), 9400));
+
+        // Leave only when BOTH are true: the captain finished her landing
+        // line AND the welcome screen has been readable for a moment.
+        const ready = { speech: false, minTime: false, done: false };
+        const maybeLeave = () => {
+          if (ready.done || !ready.speech || !ready.minTime) return;
+          ready.done = true;
+          setPhase("fade");
+          timersRef.current.push(window.setTimeout(() => finishGentlyRef.current(), 1700));
+        };
+        speakRef.current(100, () => {
+          ready.speech = true;
+          maybeLeave();
+        });
+        timersRef.current.push(
+          window.setTimeout(() => {
+            ready.minTime = true;
+            maybeLeave();
+          }, 7600),
+        );
+        // Safety net if the browser never fires the speech end event.
+        timersRef.current.push(
+          window.setTimeout(() => {
+            ready.speech = true;
+            ready.minTime = true;
+            maybeLeave();
+          }, 16000),
+        );
       }
     }, 200);
     return () => window.clearInterval(tick);

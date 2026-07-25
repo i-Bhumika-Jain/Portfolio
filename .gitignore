@@ -45,3 +45,5 @@ dev-server.log
 
 # old local nested project folder
 /portfolio/
+
+dev.log

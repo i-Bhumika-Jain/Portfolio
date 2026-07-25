@@ -11,7 +11,7 @@ import { profile, stats } from "@/data/portfolio";
  * portfolio when loading reaches 100%.
  */
 
-type Phase = "gate" | "flight" | "landing" | "welcome";
+type Phase = "gate" | "flight" | "landing" | "welcome" | "fade";
 
 /* Narration lines, spoken by the "captain" via the Web Speech API. */
 const NARRATION: { at: number; text: string }[] = [
@@ -243,6 +243,21 @@ function BoardingPass({ onBoard, onSkip }: { onBoard: () => void; onSkip: () => 
           <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-cyan-300">Dev Airways</span>
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-400">Boarding pass</span>
         </div>
+        <div className="flex items-center justify-center gap-6 border-b border-dashed border-cyan-200/20 bg-cyan-300/[0.04] px-6 py-3">
+          <button
+            onClick={onSkip}
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200 underline-offset-4 transition hover:text-white hover:underline"
+          >
+            View portfolio directly →
+          </button>
+          <a
+            href={profile.resume}
+            download
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200 underline-offset-4 transition hover:text-white hover:underline"
+          >
+            ↓ Download résumé
+          </a>
+        </div>
         <div className="grid grid-cols-3 gap-4 px-6 py-5">
           <div className="col-span-2">
             <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500">Passenger of honour</p>
@@ -301,21 +316,7 @@ function BoardingPass({ onBoard, onSkip }: { onBoard: () => void; onSkip: () => 
           <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500">
             Headphones on — your captain will speak
           </p>
-          <div className="mt-4 flex items-center justify-center gap-6 border-t border-dashed border-cyan-200/20 pt-4">
-            <button
-              onClick={onSkip}
-              className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 underline-offset-4 transition hover:text-cyan-200 hover:underline"
-            >
-              View portfolio directly →
-            </button>
-            <a
-              href={profile.resume}
-              download
-              className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 underline-offset-4 transition hover:text-cyan-200 hover:underline"
-            >
-              ↓ Download résumé
-            </a>
-          </div>
+
         </div>
       </motion.div>
     </motion.div>
@@ -332,6 +333,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<Phase>("gate");
 
   // Mark the flight as flown and hand over to the portfolio.
+  // Cancels any speech - used by the skip buttons.
   const finish = () => {
     try {
       window.localStorage.setItem("bj26-flown", "1");
@@ -339,8 +341,18 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
     window.speechSynthesis?.cancel();
     onDone();
   };
+  // Natural landing: let the captain's last line finish speaking
+  // while the screen fades out, instead of cutting the audio.
+  const finishGently = () => {
+    try {
+      window.localStorage.setItem("bj26-flown", "1");
+    } catch {}
+    onDone();
+  };
   const finishRef = useRef(finish);
   finishRef.current = finish;
+  const finishGentlyRef = useRef(finishGently);
+  finishGentlyRef.current = finishGently;
 
   useEffect(() => {
     // Returning visitors and reduced-motion users go straight to the
@@ -363,7 +375,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
   const speakRef = useRef(speak);
   speakRef.current = speak;
 
-  const landing = phase === "landing" || phase === "welcome";
+  const landing = phase === "landing" || phase === "welcome" || phase === "fade";
 
   // Landing timers live in a ref cleaned up only on unmount. If they were
   // owned by the flight effect, the phase change to "landing" would clear
@@ -385,7 +397,8 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
         speakRef.current(100);
         timersRef.current.push(window.setTimeout(() => setPhase("landing"), 500));
         timersRef.current.push(window.setTimeout(() => setPhase("welcome"), 3600));
-        timersRef.current.push(window.setTimeout(() => finishRef.current(), 7800));
+        timersRef.current.push(window.setTimeout(() => setPhase("fade"), 7800));
+        timersRef.current.push(window.setTimeout(() => finishGentlyRef.current(), 9400));
       }
     }, 200);
     return () => window.clearInterval(tick);
@@ -399,7 +412,11 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
   if (!mounted) return <div className="fixed inset-0 z-[10000] bg-[#040a16]" />;
 
   return (
-    <div className="fixed inset-0 z-[10000] overflow-hidden bg-[#040a16]">
+    <motion.div
+      className="fixed inset-0 z-[10000] overflow-hidden bg-[#040a16]"
+      animate={{ opacity: phase === "fade" ? 0 : 1 }}
+      transition={{ duration: 1.5, ease: "easeInOut" }}
+    >
       {/* night sky */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(148,197,255,0.16),transparent_30%),linear-gradient(180deg,#02060f_0%,#071528_55%,#0b1e36_100%)]" />
       <Stars />
@@ -468,7 +485,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
 
       {/* welcome flash after touchdown */}
       <AnimatePresence>
-        {phase === "welcome" && (
+        {(phase === "welcome" || phase === "fade") && (
           <motion.div
             key="welcome"
             className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-[#02060f]/55 text-center backdrop-blur-[2px]"
@@ -506,6 +523,17 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
                 </div>
               ))}
             </motion.div>
+            <motion.a
+              href={profile.resume}
+              download
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 1.4 }}
+              whileHover={{ scale: 1.04 }}
+              className="pointer-events-auto mt-8 inline-flex items-center gap-2 rounded-full border border-cyan-300/50 bg-cyan-300/10 px-7 py-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-cyan-200 shadow-[0_0_30px_rgba(56,189,248,0.25)] backdrop-blur transition hover:bg-cyan-300/20"
+            >
+              ↓ Download résumé
+            </motion.a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -532,6 +560,6 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -17,7 +17,7 @@ type Phase = "gate" | "flight" | "landing" | "welcome";
 const NARRATION: { at: number; text: string }[] = [
   { at: 0, text: "Good evening. Welcome aboard flight B J 26 with Dev Airways. Your captain today is Bhumika Jain, software developer." },
   { at: 30, text: "Bhumika turns slow, manual, error prone workflows into fast, automated systems." },
-  { at: 62, text: "She builds with Python, Django, React, and A I powered O C R. From D N S automation to cloud migration." },
+  { at: 62, text: "She builds with Python, Django, React, and A I powered O C R. From D N S automation and cloud migration, to backup automation with Ansible." },
   { at: 100, text: "We are now beginning our descent. Welcome to Bhumika's portfolio." },
 ];
 
@@ -225,7 +225,7 @@ function Runway() {
   );
 }
 
-function BoardingPass({ onBoard }: { onBoard: () => void }) {
+function BoardingPass({ onBoard, onSkip }: { onBoard: () => void; onSkip: () => void }) {
   return (
     <motion.div
       key="gate"
@@ -274,12 +274,26 @@ function BoardingPass({ onBoard }: { onBoard: () => void }) {
             <span key={i} className="w-[3px] bg-cyan-100" style={{ height: `${30 + seeded(i + 60) * 70}%` }} />
           ))}
         </div>
-        <div className="px-6 pb-6 pt-4">
+        <div className="relative px-6 pb-6 pt-4">
+          {/* animated hint pointing down at the board button */}
+          <motion.div
+            className="pointer-events-none mb-2 flex items-center justify-center gap-2"
+            animate={{ y: [0, 6, 0], opacity: [0.65, 1, 0.65] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            aria-hidden="true"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-200">Click here to start your flight</span>
+            <svg viewBox="0 0 24 28" className="h-5 w-4 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.9)]">
+              <path d="M12 2 v18 M4 14 l8 8 8-8" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
           <motion.button
             onClick={onBoard}
             whileHover={{ scale: 1.025 }}
             whileTap={{ scale: 0.97 }}
-            className="group flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-cyan-400 to-sky-500 px-6 py-3.5 font-mono text-sm font-bold uppercase tracking-[0.3em] text-[#04101f] shadow-[0_0_35px_rgba(56,189,248,0.45)]"
+            animate={{ boxShadow: ["0 0 25px rgba(56,189,248,0.35)", "0 0 55px rgba(56,189,248,0.75)", "0 0 25px rgba(56,189,248,0.35)"] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="group flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-cyan-400 to-sky-500 px-6 py-3.5 font-mono text-sm font-bold uppercase tracking-[0.3em] text-[#04101f]"
           >
             Board now
             <motion.span animate={{ x: [0, 6, 0] }} transition={{ duration: 1.4, repeat: Infinity }}>✈</motion.span>
@@ -287,6 +301,21 @@ function BoardingPass({ onBoard }: { onBoard: () => void }) {
           <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500">
             Headphones on — your captain will speak
           </p>
+          <div className="mt-4 flex items-center justify-center gap-6 border-t border-dashed border-cyan-200/20 pt-4">
+            <button
+              onClick={onSkip}
+              className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 underline-offset-4 transition hover:text-cyan-200 hover:underline"
+            >
+              View portfolio directly →
+            </button>
+            <a
+              href={profile.resume}
+              download
+              className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400 underline-offset-4 transition hover:text-cyan-200 hover:underline"
+            >
+              ↓ Download résumé
+            </a>
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -310,10 +339,15 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
 
   const landing = phase === "landing" || phase === "welcome";
 
+  // Landing timers live in a ref cleaned up only on unmount. If they were
+  // owned by the flight effect, the phase change to "landing" would clear
+  // them and the intro would never hand over to the portfolio.
+  const timersRef = useRef<number[]>([]);
+  useEffect(() => () => timersRef.current.forEach((t) => window.clearTimeout(t)), []);
+
   useEffect(() => {
     if (phase !== "flight") return;
     let value = 0;
-    const timers: number[] = [];
     const tick = window.setInterval(() => {
       value = Math.min(100, value + Math.floor(Math.random() * 3) + 1);
       setCount(value);
@@ -323,15 +357,12 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
       if (value >= 100) {
         window.clearInterval(tick);
         speakRef.current(100);
-        timers.push(window.setTimeout(() => setPhase("landing"), 500));
-        timers.push(window.setTimeout(() => setPhase("welcome"), 3600));
-        timers.push(window.setTimeout(onDone, 6300));
+        timersRef.current.push(window.setTimeout(() => setPhase("landing"), 500));
+        timersRef.current.push(window.setTimeout(() => setPhase("welcome"), 3600));
+        timersRef.current.push(window.setTimeout(onDone, 6300));
       }
     }, 200);
-    return () => {
-      window.clearInterval(tick);
-      timers.forEach((t) => window.clearTimeout(t));
-    };
+    return () => window.clearInterval(tick);
   }, [phase, onDone]);
 
   const board = () => {
@@ -361,7 +392,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
         </motion.div>
       )}
 
-      <AnimatePresence>{phase === "gate" && <BoardingPass onBoard={board} />}</AnimatePresence>
+      <AnimatePresence>{phase === "gate" && <BoardingPass onBoard={board} onSkip={onDone} />}</AnimatePresence>
 
       {phase !== "gate" && <BannerPlane landing={landing} />}
       {landing && <Runway />}

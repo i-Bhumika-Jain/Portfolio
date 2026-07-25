@@ -37,7 +37,7 @@ export const profile = {
 
 export const about = [
   "I'm a Software Developer who likes turning slow, manual, error-prone workflows into fast, validated, automated systems.",
-  "At Chi Networks I automated DNS/rDNS operations, built change-request tooling, and worked on cloud VM migration across OpenStack and VMware/vCenter. Before that I built OCR automation and CRM tooling that cut manual data entry sharply.",
+  "At Chi Networks I automated DNS/rDNS operations, built change-request tooling, and worked on cloud VM migration across OpenStack and VMware/vCenter. Right now I'm automating our backup processes with Ansible. Before that I built OCR automation and CRM tooling that cut manual data entry sharply.",
   "I work across the stack with Python, Django REST, FastAPI, React, Material UI, and shadcn/ui, with a soft spot for AI/OCR and clean, measurable results.",
 ];
 
@@ -93,6 +93,7 @@ export const experience: ExperienceItem[] = [
       "Worked on the MoveVM / VM migration module for OpenStack and VMware/vCenter, adding target-host selection, compatibility indicators, migration flows, and datastore visibility.",
       "Improved admin-platform speed and reliability through query optimization, caching, pagination, log analysis, Postman validation, and CI/CD deployment debugging.",
       "Developed React admin screens with Material UI and shadcn/ui for forms, tables, filters, dashboards, and frontend-backend workflows.",
+      "Currently automating server backup processes with Ansible playbooks, replacing manual backup runs with scheduled, repeatable, verifiable automation.",
     ],
   },
   {
@@ -166,7 +167,7 @@ export const skillGroups: SkillGroup[] = [
   { label: "AI / OCR", items: ["PaddleOCR", "Gradio", "LangChain", "Gemini API"] },
   {
     label: "Tools",
-    items: ["Git", "GitHub", "Postman", "Linux", "Jenkins", "Playwright", "Sentry", "CI/CD"],
+    items: ["Git", "GitHub", "Postman", "Linux", "Ansible", "Jenkins", "Playwright", "Sentry", "CI/CD"],
   },
 ];
 

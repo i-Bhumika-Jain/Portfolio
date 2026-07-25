@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 640" role="img" aria-label="Friendly coder avatar">
+  <defs><radialGradient id="bg" cx="50%" cy="42%" r="70%"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#d9dde4"/></radialGradient></defs>
+  <rect width="500" height="640" fill="url(#bg)"/>
+  <ellipse cx="250" cy="523" rx="166" ry="38" fill="#c49743" opacity=".25"/>
+  <path d="M116 520c14-92 63-143 134-143s120 51 134 143z" fill="#f2b43d" stroke="#3b2a15" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M157 428l45 52M343 428l-45 52" stroke="#3b2a15" stroke-width="8" stroke-linecap="round"/>
+  <path d="M146 234c3-76 48-125 105-125s99 49 103 125l-36 59H179z" fill="#7b4b23" stroke="#3b2a15" stroke-width="7"/>
+  <ellipse cx="250" cy="257" rx="78" ry="88" fill="#e9b07f" stroke="#3b2a15" stroke-width="7"/>
+  <path d="M178 226c38-6 69-24 94-58 21 24 42 39 66 45-20-63-58-94-101-87-41 7-67 44-59 100z" fill="#8b5a2b"/>
+  <circle cx="222" cy="268" r="8" fill="#2a2018"/><circle cx="278" cy="268" r="8" fill="#2a2018"/>
+  <rect x="197" y="248" width="48" height="34" rx="13" fill="none" stroke="#2a2018" stroke-width="8"/>
+  <rect x="255" y="248" width="48" height="34" rx="13" fill="none" stroke="#2a2018" stroke-width="8"/>
+  <path d="M245 265h10" stroke="#2a2018" stroke-width="7" stroke-linecap="round"/>
+  <path d="M224 313c16 14 36 14 52 0" fill="none" stroke="#7b2d2d" stroke-width="7" stroke-linecap="round"/>
+  <rect x="135" y="424" width="230" height="122" rx="14" fill="#64748b" stroke="#2f3d4f" stroke-width="8"/>
+  <path d="M226 472l-28 21 28 21M274 472l28 21-28 21" fill="none" stroke="#f5d162" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M151 397c-45-16-69 2-72 38-2 24 15 47 39 44 22-3 38-31 25-50" fill="#e9b07f" stroke="#3b2a15" stroke-width="8" stroke-linecap="round"/>
+  <path d="M107 419l18-18M124 422l18-18" stroke="#3b2a15" stroke-width="8" stroke-linecap="round"/>
+</svg>

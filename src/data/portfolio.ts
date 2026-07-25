@@ -2,17 +2,36 @@
 
 export const profile = {
   name: "Bhumika Jain",
+  // Split of `name` used for the stacked cinematic hero title.
+  firstName: "Bhumika",
+  lastName: "Jain",
+  greeting: "Hi, I'm",
   role: "Software Developer",
   tagline:
     "Full-stack engineer building automation-first platforms, DNS/rDNS pipelines, cloud VM migration, and AI/OCR systems with Python, Django, and React.",
+  // Word inside the tagline to highlight in the hero card.
+  taglineHighlight: "automation-first",
+  availableLabel: "Open to new opportunities",
+  // Short badges shown under the hero name - all drawn from the skills below.
+  heroPills: ["Python", "Django", "React", "AI / OCR"],
   location: "India",
   email: "i.jainbhumika@gmail.com",
   github: "https://github.com/i-Bhumika-Jain",
   githubLabel: "github.com/i-Bhumika-Jain",
   linkedin: "https://linkedin.com/in/bhumika-jain-0749031ba",
   linkedinLabel: "linkedin.com/in/bhumika-jain",
-  // Drop a square photo at public/profile.jpg to replace the monogram avatar.
-  photo: "/profile.jpg",
+  resume: "/Bhumika-Jain-Resume.pdf",
+  avatarOptions: [
+    { src: "/avatars/avatar-4.svg", label: "Cyber engineer" },
+    { src: "/avatars/avatar-5.svg", label: "Neon anime coder" },
+    { src: "/avatars/avatar-1.svg", label: "Warm studio developer" },
+    { src: "/avatars/avatar-2.svg", label: "Playful headset creator" },
+    { src: "/avatars/avatar-3.svg", label: "Friendly coder" },
+  ],
+  // Full-bleed cinematic hero portrait (right side). Optimized WebP (~87KB).
+  heroPhoto: "/hero.webp",
+  // About avatar - optimized WebP (~23KB).
+  photo: "/profile.webp",
   initials: "BJ",
 };
 

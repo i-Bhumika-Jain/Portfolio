@@ -32,6 +32,11 @@ Then open this in your browser:
 ```text
 http://localhost:3000
 ```
+If port `3000` is already in use, Next.js will automatically choose the next available port. Check the PowerShell output for the exact URL, for example:
+
+```text
+http://localhost:3001
+```
 
 ## Why Use `pushd`?
 

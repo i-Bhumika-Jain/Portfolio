@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 640" role="img" aria-label="Warm developer avatar">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2a1d32"/><stop offset="0.58" stop-color="#806246"/><stop offset="1" stop-color="#f4ba79"/></linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8b4b2d"/><stop offset="1" stop-color="#f2b875"/></linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#49304f"/><stop offset="1" stop-color="#c88355"/></linearGradient>
+  </defs>
+  <rect width="500" height="640" fill="url(#bg)"/>
+  <circle cx="372" cy="108" r="68" fill="#f6d49d" opacity=".28"/>
+  <rect x="52" y="392" width="396" height="174" rx="28" fill="url(#desk)"/>
+  <rect x="255" y="228" width="172" height="123" rx="10" fill="#122033"/>
+  <rect x="270" y="242" width="142" height="82" rx="5" fill="#0b1220"/>
+  <path d="M286 258h76M286 276h104M286 294h62M286 312h92" stroke="#39d6d6" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+  <path d="M111 332c4-95 57-159 129-159 70 0 121 63 126 159l-42 6c-6-61-36-100-84-100s-78 39-84 100z" fill="url(#hair)"/>
+  <path d="M153 506c10-88 45-137 92-137s83 49 93 137z" fill="#8fa0b8"/>
+  <path d="M166 506c8-61 32-95 79-95s72 34 80 95z" fill="#dbe5f2"/>
+  <ellipse cx="245" cy="298" rx="72" ry="86" fill="#e9ad86"/>
+  <path d="M168 282c24-68 72-96 143-78 21 18 33 44 40 75-42-30-93-31-140-8-16 8-29 11-43 11z" fill="#7b3f29"/>
+  <circle cx="220" cy="308" r="8" fill="#182033"/><circle cx="272" cy="308" r="8" fill="#182033"/>
+  <path d="M224 345c16 13 39 13 55 0" fill="none" stroke="#8b2635" stroke-width="7" stroke-linecap="round"/>
+  <path d="M126 424l83-24 18 34-91 32zM321 434l58 18 16 34-82-17z" fill="#d99b7c"/>
+  <rect x="126" y="426" width="178" height="86" rx="12" fill="#27364b"/>
+  <rect x="154" y="456" width="102" height="13" rx="6" fill="#44d4ff" opacity=".75"/>
+  <circle cx="78" cy="474" r="25" fill="#f5eee3"/><rect x="58" y="472" width="41" height="40" rx="12" fill="#f5eee3"/>
+</svg>

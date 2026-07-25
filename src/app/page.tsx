@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { motion, useScroll, useSpring, useTransform, type Variants } from "framer-motion";
-import { ArrowUpRight, Download, GraduationCap, Mail, MapPin, X } from "lucide-react";
+import { ArrowUpRight, Download, GraduationCap, Mail, MapPin, RotateCcw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
 import HeroScene from "@/components/HeroScene";
@@ -11,6 +11,8 @@ import {
   education,
   experience,
   navLinks,
+  problemSignals,
+  processSteps,
   profile,
   projects,
   skillGroups,
@@ -741,6 +743,241 @@ function About() {
   );
 }
 
+/**
+ * The problem-to-system diagram.
+ *
+ * Six problem chips start scattered and tangled, then settle into an ordered
+ * column that feeds a working system. The transition is the whole point, so it
+ * runs on scroll-into-view and can be replayed.
+ *
+ * Motion is driven by variants rather than state-in-effect, and the labels are
+ * the *kinds* of problems this work starts from - no claims are made here.
+ */
+const NODE_W = 196;
+const NODE_H = 42;
+
+const MESSY_LAYOUT = [
+  { x: 300, y: 8, rotate: -7 },
+  { x: 34, y: 68, rotate: 6 },
+  { x: 556, y: 34, rotate: -4 },
+  { x: 246, y: 148, rotate: 8 },
+  { x: 604, y: 188, rotate: -9 },
+  { x: 52, y: 236, rotate: 5 },
+];
+
+function ProblemToSystem() {
+  // Bumping the key remounts the svg, which replays every variant from "messy".
+  const [runId, setRunId] = useState(0);
+
+  const nodes = problemSignals.slice(0, 6).map((label, i) => ({
+    label,
+    messy: MESSY_LAYOUT[i],
+    tidy: { x: 24, y: 14 + i * 48, rotate: 0 },
+  }));
+
+  // Tangled connectors, drawn between the scattered positions.
+  const centre = (p: { x: number; y: number }) => ({
+    cx: p.x + NODE_W / 2,
+    cy: p.y + NODE_H / 2,
+  });
+  const tangles = [
+    [0, 1],
+    [1, 3],
+    [3, 2],
+    [2, 4],
+    [4, 5],
+    [5, 0],
+  ].map(([a, b]) => {
+    const from = centre(MESSY_LAYOUT[a]);
+    const to = centre(MESSY_LAYOUT[b]);
+    // Bow each line the opposite way so the cluster reads as knotted.
+    const bow = (a % 2 ? -1 : 1) * 60;
+    return `M${from.cx} ${from.cy} Q ${(from.cx + to.cx) / 2 + bow} ${
+      (from.cy + to.cy) / 2 - bow
+    } ${to.cx} ${to.cy}`;
+  });
+
+  return (
+    <div className="relative">
+      <motion.svg
+        key={runId}
+        viewBox="0 0 960 320"
+        className="w-full"
+        initial="messy"
+        whileInView="tidy"
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ staggerChildren: 0.07, delayChildren: 0.35 }}
+        role="img"
+        aria-label="Six scattered problems - manual steps, scattered systems, repeated data entry, slow queries, no visibility and access control - reorganising into an ordered sequence that feeds a single working system."
+      >
+        {/* Knotted connectors, present only while things are still a mess. */}
+        <motion.g
+          variants={{ messy: { opacity: 1 }, tidy: { opacity: 0 } }}
+          transition={{ duration: 0.5 }}
+        >
+          {tangles.map((d, i) => (
+            <path
+              key={i}
+              d={d}
+              fill="none"
+              stroke="rgba(255,255,255,0.16)"
+              strokeWidth={1.4}
+              strokeDasharray="5 7"
+            />
+          ))}
+        </motion.g>
+
+        {/* The ordered spine that replaces them. */}
+        <motion.g
+          variants={{ messy: { opacity: 0 }, tidy: { opacity: 1 } }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <path d="M12 30 V 282" stroke="url(#p2sLine)" strokeWidth={2} strokeLinecap="round" />
+          <path
+            d="M232 160 H 448 m -10 -6 l 10 6 l -10 6"
+            fill="none"
+            stroke="url(#p2sLine)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </motion.g>
+
+        {/* The problems themselves. */}
+        {nodes.map((node, i) => (
+          <motion.g
+            key={node.label}
+            custom={node}
+            variants={{
+              messy: (n: typeof node) => ({ x: n.messy.x, y: n.messy.y, rotate: n.messy.rotate }),
+              tidy: (n: typeof node) => ({ x: n.tidy.x, y: n.tidy.y, rotate: 0 }),
+            }}
+            transition={{ type: "spring", stiffness: 60, damping: 16 }}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
+          >
+            <rect
+              width={NODE_W}
+              height={NODE_H}
+              rx={10}
+              fill="rgba(255,255,255,0.045)"
+              stroke="rgba(255,255,255,0.14)"
+              strokeWidth={1.2}
+            />
+            <circle cx={18} cy={NODE_H / 2} r={3.5} fill="#22d3ee" opacity={0.75} />
+            <text
+              x={34}
+              y={NODE_H / 2 + 4}
+              fontSize={13}
+              fill="#c9d2de"
+              style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            >
+              {node.label}
+            </text>
+            <text x={NODE_W - 14} y={NODE_H / 2 + 4} fontSize={11} fill="#5c6675" textAnchor="end">
+              {`0${i + 1}`}
+            </text>
+          </motion.g>
+        ))}
+
+        {/* What it turns into. */}
+        <motion.g
+          variants={{ messy: { opacity: 0, x: 24 }, tidy: { opacity: 1, x: 0 } }}
+          transition={{ duration: 0.6, delay: 0.95 }}
+        >
+          <rect
+            x={470}
+            y={86}
+            width={440}
+            height={148}
+            rx={16}
+            fill="rgba(34,211,238,0.05)"
+            stroke="rgba(34,211,238,0.32)"
+            strokeWidth={1.3}
+          />
+          <text
+            x={496}
+            y={122}
+            fontSize={15}
+            fill="#e8edf4"
+            style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
+          >
+            a working system
+          </text>
+          {["validated flows", "queues + workers", "one screen to see it"].map((line, i) => (
+            <g key={line}>
+              <circle cx={502} cy={152 + i * 26} r={3} fill="#818cf8" />
+              <text
+                x={518}
+                y={156 + i * 26}
+                fontSize={12.5}
+                fill="#9aa5b4"
+                style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+              >
+                {line}
+              </text>
+            </g>
+          ))}
+        </motion.g>
+
+        <defs>
+          <linearGradient id="p2sLine" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#22d3ee" />
+            <stop offset="100%" stopColor="#818cf8" />
+          </linearGradient>
+        </defs>
+      </motion.svg>
+
+      <button
+        type="button"
+        onClick={() => setRunId((n) => n + 1)}
+        className="absolute right-0 top-0 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400 transition hover:border-cyan-400/40 hover:text-cyan-300"
+      >
+        <RotateCcw className="h-3 w-3" aria-hidden="true" />
+        Replay
+      </button>
+    </div>
+  );
+}
+
+function Process() {
+  return (
+    <section id="process" className="relative overflow-hidden border-t border-white/5 py-24 sm:py-32">
+      <SectionCurtain />
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
+        <SectionHeading
+          eyebrow="Process"
+          title="How a messy problem becomes a working system."
+        />
+
+        <Reveal>
+          <p className="u-body mb-10 max-w-2xl text-zinc-400">
+            Every project below started as something slow and manual. The domain changes; the
+            method does not.
+          </p>
+        </Reveal>
+
+        <Reveal>
+          <div className="surface rounded-3xl p-5 sm:p-8">
+            <ProblemToSystem />
+          </div>
+        </Reveal>
+
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {processSteps.map((step, index) => (
+            <Reveal key={step.title} delay={index * 0.06}>
+              <li className="surface h-full rounded-2xl p-5">
+                <span className="font-mono text-xs text-cyan-400">{`0${index + 1}`}</span>
+                <h3 className="mt-1.5 text-base font-semibold text-white">{step.title}</h3>
+                <p className="mt-1.5 text-sm leading-6 text-zinc-400">{step.detail}</p>
+              </li>
+            </Reveal>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
 function Experience() {
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -975,6 +1212,7 @@ export default function Home() {
         <Nav />
         <Hero />
         <About />
+        <Process />
         <Experience />
         <Projects />
         <Skills />

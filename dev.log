@@ -1,0 +1,9 @@
+▲ Next.js 16.2.10 (webpack)
+- Local:         http://localhost:3007
+- Network:       http://192.168.219.40:3007
+✓ Ready in 7.0s
+
+○ Compiling / ...
+ GET / 200 in 19.0s (next.js: 17.0s, application-code: 2.0s)
+ GET / 200 in 19.2s (next.js: 17.0s, application-code: 2.2s)
+ GET / 200 in 127ms (next.js: 34ms, application-code: 94ms)

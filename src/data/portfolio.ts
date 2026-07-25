@@ -48,6 +48,33 @@ export const stats = [
   { value: "2+", label: "Years building production software" },
 ];
 
+/**
+ * How a messy problem becomes a working system. This describes method only -
+ * it makes no factual claims beyond the work already listed below.
+ */
+export type ProcessStep = { title: string; detail: string };
+
+// Named `processSteps`, never `process` - that would shadow Node's global
+// `process` inside the bundle and break Next's prerender.
+export const processSteps: ProcessStep[] = [
+  { title: "Understand", detail: "Sit with the real workflow and find where the time actually goes." },
+  { title: "Break down", detail: "Split the mess into parts small enough to reason about." },
+  { title: "Design", detail: "Choose the data model, the boundaries, and the failure cases." },
+  { title: "Build", detail: "Write it end to end - API, workers, and the screens people use." },
+  { title: "Test", detail: "Validate against real edge cases, not the happy path." },
+  { title: "Improve", detail: "Measure, optimize queries, cache, and remove what is slow." },
+];
+
+/** The kinds of problems that work starts from, used by the process diagram. */
+export const problemSignals = [
+  "manual steps",
+  "scattered systems",
+  "repeated data entry",
+  "slow queries",
+  "no visibility",
+  "access control",
+];
+
 export type ExperienceItem = {
   company: string;
   role: string;
@@ -152,6 +179,7 @@ export const education = {
 
 export const navLinks = [
   { href: "#about", label: "About" },
+  { href: "#process", label: "Process" },
   { href: "#experience", label: "Experience" },
   { href: "#projects", label: "Projects" },
   { href: "#skills", label: "Skills" },

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, useScroll, useSpring, useTransform, type Variants } from "framer-motion";
 import { ArrowUpRight, Download, GraduationCap, Mail, MapPin, RotateCcw, X } from "lucide-react";
@@ -59,7 +59,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   );
 }
 
-function Nav() {
+function Nav({ onReplay }: { onReplay?: () => void }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -78,6 +78,15 @@ function Nav() {
               {link.label}
             </a>
           ))}
+          {onReplay && (
+            <button
+              onClick={onReplay}
+              className="flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-sm font-medium text-cyan-300 transition-colors hover:bg-cyan-400/20"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Replay Intro
+            </button>
+          )}
         </nav>
 
         <a
@@ -114,6 +123,18 @@ function Nav() {
               {link.label}
             </a>
           ))}
+          {onReplay && (
+            <button
+              onClick={() => {
+                setOpen(false);
+                onReplay();
+              }}
+              className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-cyan-400 transition hover:bg-white/5 hover:text-cyan-300"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Replay Intro
+            </button>
+          )}
         </nav>
       )}
     </header>
@@ -1196,20 +1217,34 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
   const [tourActive, setTourActive] = useState(false);
 
-  function finishLoading() {
+  function finishLoading(skipped?: boolean) {
     setLoaded(true);
-    window.setTimeout(() => setTourActive(true), 450);
+    if (!skipped) {
+      window.setTimeout(() => setTourActive(true), 450);
+    } else {
+      window.setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 100);
+    }
   }
 
   function closeTour() {
     setTourActive(false);
   }
 
+  function replayIntro() {
+    try {
+      window.localStorage.removeItem("bj26-flown");
+    } catch {}
+    setTourActive(false);
+    setLoaded(false);
+  }
+
   return (
     <>
       {!loaded && <ScreenLoader onDone={finishLoading} />}
       <main className="relative">
-        <Nav />
+        <Nav onReplay={replayIntro} />
         <Hero />
         <About />
         <Process />

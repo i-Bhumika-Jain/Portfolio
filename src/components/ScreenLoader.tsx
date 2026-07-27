@@ -252,21 +252,6 @@ function BoardingPass({ onBoard, onSkip }: { onBoard: () => void; onSkip: () => 
           <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-cyan-300">Dev Airways</span>
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-400">Boarding pass</span>
         </div>
-        <div className="flex items-center justify-center gap-6 border-b border-dashed border-cyan-200/20 bg-cyan-300/[0.04] px-6 py-3">
-          <button
-            onClick={onSkip}
-            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200 underline-offset-4 transition hover:text-white hover:underline"
-          >
-            View portfolio directly →
-          </button>
-          <a
-            href={profile.resume}
-            download
-            className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200 underline-offset-4 transition hover:text-white hover:underline"
-          >
-            ↓ Download résumé
-          </a>
-        </div>
         <div className="grid grid-cols-3 gap-4 px-6 py-5">
           <div className="col-span-2">
             <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500">Passenger of honour</p>
@@ -335,7 +320,7 @@ function BoardingPass({ onBoard, onSkip }: { onBoard: () => void; onSkip: () => 
 const phaseLabel = (p: number) =>
   p < 14 ? "Taxiing to runway" : p < 32 ? "Takeoff" : p < 68 ? "Cruising at 32,000 ft" : p < 88 ? "Beginning descent" : "Final approach";
 
-export default function ScreenLoader({ onDone }: { onDone: () => void }) {
+export default function ScreenLoader({ onDone }: { onDone: (skipped?: boolean) => void }) {
   // Animated overlay is client-only: skip SSR markup entirely so
   // framer-motion's computed styles can't cause hydration mismatches.
   const [mounted, setMounted] = useState(false);
@@ -348,7 +333,7 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
       window.localStorage.setItem("bj26-flown", "1");
     } catch {}
     window.speechSynthesis?.cancel();
-    onDone();
+    onDone(true);
   };
   // Natural landing: let the captain's last line finish speaking
   // while the screen fades out, instead of cutting the audio.
@@ -573,8 +558,21 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
       </AnimatePresence>
 
       {/* controls */}
-      {phase !== "gate" && (
-        <div className="absolute right-4 top-4 z-[70] flex items-center gap-2">
+      <div className="absolute right-4 top-4 z-[70] flex items-center gap-2">
+        <a
+          href={profile.resume}
+          download
+          className="hidden rounded-full border border-white/15 bg-white/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur transition hover:border-cyan-300/50 hover:text-cyan-200 sm:block"
+        >
+          Download Resume
+        </a>
+        <button
+          onClick={finish}
+          className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur transition hover:border-cyan-300/50 hover:text-cyan-200"
+        >
+          View Portfolio
+        </button>
+        {phase !== "gate" && (
           <button
             onClick={() => {
               setVoiceOn((v) => {
@@ -586,14 +584,8 @@ export default function ScreenLoader({ onDone }: { onDone: () => void }) {
           >
             {voiceOn ? "Voice on" : "Voice off"}
           </button>
-          <button
-            onClick={finish}
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur transition hover:border-cyan-300/50 hover:text-cyan-200"
-          >
-            Skip flight
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </motion.div>
   );
 }
